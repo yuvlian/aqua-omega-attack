@@ -1,5 +1,7 @@
 package cs2
 
+import m "../memowy"
+
 // CPlayer_ObserverServices {client}
 Player_Observer_Services :: struct #packed {
     // m_hObserverTarget
@@ -114,16 +116,16 @@ Counter_Strike_Weapon_Base :: struct #packed {
     is_reloading: bool `0x1814`,
 }
 
-UNK :: 0x00
+UNK :: m.SIGNATURE_WILDCARD
 
-CSGO_INPUT_SIGNATURE :: []u8 {
+CSGO_INPUT_SIGNATURE :: []u16 {
     0x48, 0x89, 0x05,
     UNK, UNK, UNK, UNK,
     0x0F, 0x57, 0xC0,
     0x0F, 0x11, 0x05,
 };
 
-ENTITY_LIST_SIGNATURE :: []u8 {
+ENTITY_LIST_SIGNATURE :: []u16 {
     0x48, 0x89, 0x0D,
     UNK, UNK, UNK, UNK,
     0xE9,
@@ -131,7 +133,7 @@ ENTITY_LIST_SIGNATURE :: []u8 {
     0xCC,
 };
 
-GAME_ENTITY_SYSTEM_SIGNATURE :: []u8 {
+GAME_ENTITY_SYSTEM_SIGNATURE :: []u16 {
     0x48, 0x8B, 0x1D,
     UNK, UNK, UNK, UNK,
     0x48, 0x89, 0x1D,
@@ -139,7 +141,7 @@ GAME_ENTITY_SYSTEM_SIGNATURE :: []u8 {
     0x4C, 0x63, 0xB3,
 };
 
-GAME_RULES_SIGNATURE :: []u8 {
+GAME_RULES_SIGNATURE :: []u16 {
     0xF6, 0xC1, 0x01,
     0x0F, 0x85,
     UNK, UNK, UNK, UNK,
@@ -148,13 +150,13 @@ GAME_RULES_SIGNATURE :: []u8 {
     0x4D, 0x85,
 };
 
-GLOBAL_VARS_SIGNATURE :: []u8 {
+GLOBAL_VARS_SIGNATURE :: []u16 {
     0x48, 0x89, 0x15,
     UNK, UNK, UNK, UNK,
     0x48, 0x89, 0x42,
 };
 
-GLOW_MANAGER_SIGNATURE :: []u8 {
+GLOW_MANAGER_SIGNATURE :: []u16 {
     0x48, 0x8B, 0x05,
     UNK, UNK, UNK, UNK,
     0xC3,
@@ -163,19 +165,19 @@ GLOW_MANAGER_SIGNATURE :: []u8 {
     0x8B, 0x41,
 };
 
-LOCAL_PLAYER_CONTROLLER_SIGNATURE :: []u8 {
+LOCAL_PLAYER_CONTROLLER_SIGNATURE :: []u16 {
     0x48, 0x8B, 0x05,
     UNK, UNK, UNK, UNK,
     0x41, 0x89, 0xBE,
 };
 
-PLANTED_C4_SIGNATURE :: []u8 {
+PLANTED_C4_SIGNATURE :: []u16 {
     0x48, 0x8B, 0x1D,
     UNK, UNK, UNK, UNK,
     0x45, 0x32, 0xF6,
 };
 
-PREDICTION_SIGNATURE :: []u8 {
+PREDICTION_SIGNATURE :: []u16 {
     0x48, 0x8D, 0x05,
     UNK, UNK, UNK, UNK,
     0xC3,
@@ -184,27 +186,27 @@ PREDICTION_SIGNATURE :: []u8 {
     0x40, 0x53, 0x56, 0x41, 0x54,
 };
 
-SENSITIVITY_SIGNATURE :: []u8 {
+SENSITIVITY_SIGNATURE :: []u16 {
     0x48, 0x8D, 0x0D,
     UNK, UNK, UNK, UNK,
     UNK, UNK, UNK, UNK,
     0x66, 0x0F, 0x6E, 0xCD,
 };
 
-VIEW_MATRIX_SIGNATURE :: []u8 {
+VIEW_MATRIX_SIGNATURE :: []u16 {
     0x48, 0x8D, 0x0D,
     UNK, UNK, UNK, UNK,
     0x48, 0xC1, 0xE0, 0x06,
 };
 
-VIEW_RENDER_SIGNATURE :: []u8 {
+VIEW_RENDER_SIGNATURE :: []u16 {
     0x48, 0x89, 0x05,
     UNK, UNK, UNK, UNK,
     0x48, 0x8B, 0xC8,
     0x48, 0x85, 0xC0,
 };
 
-WEAPON_C4_SIGNATURE :: []u8 {
+WEAPON_C4_SIGNATURE :: []u16 {
     0x48, 0x8B, 0x15,
     UNK, UNK, UNK, UNK,
     0x48, 0x8B, 0x5C, 0x24,

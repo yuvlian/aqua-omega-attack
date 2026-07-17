@@ -200,3 +200,48 @@ read :: proc (
 //         size_of(T),
 //     )
 // }
+
+SIGNATURE_WILDCARD : u16 : 0xFFFF
+
+// signature is actually []u8 but we use u16 so we can have a wildcard
+find_signature_in_module :: proc (
+    process: windows.HANDLE,
+    module: Module_Info,
+    signature: []u16,
+) -> (uintptr, Memowy_Error) {
+    sig_len := len(signature)
+
+    if sig_len == 0 {
+        return 0, Memowy_Error.SignatureNotFound
+    }
+
+    module_memory := make([]u8, module.size)
+    defer delete(module_memory)
+
+    rr_err := read_raw(process, module.base, raw_data(module_memory), module.size)
+    if rr_err != Memowy_Error.None {
+        return 0, rr_err
+    }
+
+    for i in 0..<(module.size - uint(sig_len) + 1) {
+        matched := true
+
+        for j in 0..<sig_len {
+            b := signature[j]
+
+            if
+                b != SIGNATURE_WILDCARD &&
+                module_memory[i + uint(j)] != u8(b)
+            {
+                matched = false
+                break
+            }
+        }
+
+        if matched {
+            return module.base + uintptr(i), Memowy_Error.None
+        }
+    }
+
+    return 0, Memowy_Error.SignatureNotFound
+}
