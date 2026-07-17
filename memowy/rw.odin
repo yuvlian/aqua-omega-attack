@@ -201,7 +201,7 @@ read :: proc (
 //     )
 // }
 
-SIGNATURE_WILDCARD : u16 : 0xFFFF
+SIGNATURE_WILDCARD :: max(u16)
 
 // signature is actually []u8 but we use u16 so we can have a wildcard
 find_signature_in_module :: proc (

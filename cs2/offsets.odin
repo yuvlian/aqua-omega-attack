@@ -5,25 +5,25 @@ import m "../memowy"
 // CPlayer_ObserverServices {client}
 Player_Observer_Services :: struct #packed {
     // m_hObserverTarget
-    observer_target: uintptr `0x4c`,
+    observer_target: uintptr `0x004c`,
 }
 
 // C_AtributeContainer {client}
 Attribute_Container :: struct #packed {
     // m_Item
-    item: Econ_Item_View `0x50`,
+    item: Econ_Item_View `0x0050`,
 }
 
 // CPlayer_WeaponServices {client}
 Player_Weapon_Services :: struct #packed {
     // m_hActiveWeapon
-    active_weapon_handle: uintptr `0x60`,
+    active_weapon_handle: uintptr `0x0060`,
 }
 
 // CGameSceneNode {client}
 Game_Scene_Node :: struct #packed {
     // m_vecAbsOrigin
-    absolute_origin: [3]f32 `0xc8`,
+    absolute_origin: [3]f32 `0x00c8`,
 
     // undocumented? m_modelState (0x0140) + 0x80
     bone_array_ptr: uintptr `0x01C0`,
@@ -31,22 +31,22 @@ Game_Scene_Node :: struct #packed {
 
 // Undocumented
 Global_Vars :: struct #packed {
-    map_name: [32]u8 `0x180`,
+    map_name: [32]u8 `0x0180`,
 }
 
 // C_EconItemView {client}
 Econ_Item_View :: struct #packed {
     // m_iItemDefinitionIndex
-    definition_index: u16 `0x1BA`,
+    definition_index: u16 `0x01BA`,
 }
 
 // C_PlantedC4 {client}
 Planted_C4 :: struct #packed {
-    // m_nBombSite
-    bomb_site: i32 `0x11A4`,
-
     // m_pGameSceneNode
     game_scene_node_ptr: uintptr `0x0330`,
+
+    // m_nBombSite
+    bomb_site: i32 `0x11A4`,
 }
 
 // C_CSPlayerPawn {client}
@@ -63,27 +63,27 @@ Counter_Strike_Player_Pawn :: struct #packed {
     // m_vecAbsVelocity
     velocity: [3]f32 `0x03f8`,
 
+    // m_pWeaponServices
+    weapon_services_ptr: uintptr `0x1208`,
+
+    // m_pObserverServices
+    observer_services_ptr: uintptr `0x1220`,
+
     // m_vOldOrigin
     old_origin: [3]f32 `0x13b8`,
 
     // m_flFlashOverlayAlpha
     flash_alpha: f32 `0x141c`,
 
+    // m_entitySpottedState->m_bSpottedByMask
+    // 0x1c58 + 0x0c
+    spotted_mask: [2]u32 `0x1c64`,
+
     // m_bIsScoped
     is_scoping: bool `0x1c70`,
 
     // m_bIsDefusing
     is_defusing: bool `0x1c72`,
-
-    // m_entitySpottedState->m_bSpottedByMask
-    // 0x1c58 + 0x0c
-    spotted_mask: [2]u32 `0x1C64`,
-
-    // m_pWeaponServices
-    weapon_services_ptr: uintptr `0x1208`,
-
-    // m_pObserverServices
-    observer_services_ptr: uintptr `0x1220`,
 }
 
 // CBasePlayerController {client}
