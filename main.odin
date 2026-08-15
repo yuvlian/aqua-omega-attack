@@ -2,132 +2,186 @@ package main
 
 import "core:fmt"
 import "core:mem"
+import "core:sys/windows"
+import "core:time"
+import "./cfg"
 import "./cs2"
-import m "./memowy"
+import "./remote"
+import "./renderer"
+import "./ui"
 
-write_field :: proc (buffer: []u8, span_base: int, tag_offset: int, value: $T) {
-    value := value
-    off := tag_offset - span_base
-    dst := buffer[off:off + size_of(T)]
-    src := mem.byte_slice(&value, size_of(T))
-    copy(dst, src)
+ATTACH_RETRY_INTERVAL  :: 2 * time.Second
+// how often to check for game process
+// rn we dont use SYNCHRONIZE & WaitForSingleObject cuz im lazy
+LIVENESS_POLL_INTERVAL :: 500 * time.Millisecond
+
+main :: proc () {
+	// using `when` instead of `if` causes main.odin(4:8) Error: 'mem' declared but not used
+	// this is from https://gist.githubusercontent.com/karl-zylinski/4ccf438337123e7c8994df3b03604e33/raw/dfc02cd68fce72c35b17977c294aa02d1cf48f05/tracking_alloc_example.odin
+	if ODIN_DEBUG {
+		track: mem.Tracking_Allocator
+		mem.tracking_allocator_init(&track, context.allocator)
+		context.allocator = mem.tracking_allocator(&track)
+
+		defer {
+			if len(track.allocation_map) > 0 {
+				fmt.eprintf("=== %v allocations not freed: ===\n", len(track.allocation_map))
+				for _, entry in track.allocation_map {
+					fmt.eprintf("- %v bytes @ %v\n", entry.size, entry.location)
+				}
+			}
+			if len(track.bad_free_array) > 0 {
+				fmt.eprintf("=== %v incorrect frees: ===\n", len(track.bad_free_array))
+				for entry in track.bad_free_array {
+					fmt.eprintf("- %p @ %v\n", entry.memory, entry.location)
+				}
+			}
+			mem.tracking_allocator_destroy(&track)
+		}
+	}
+
+	cfg.load()
+
+	monitor_w := windows.GetSystemMetrics(windows.SM_CXSCREEN)
+	monitor_h := windows.GetSystemMetrics(windows.SM_CYSCREEN)
+
+	hwnd, ok := renderer.window_create(cfg.WINDOW_TITLE,
+		cfg.WINDOW_CLASS, int(monitor_w), int(monitor_h))
+
+	if !ok {
+		fmt.eprintln("failed to create overlay window")
+		return
+	}
+	if !renderer.present_init(int(monitor_w), int(monitor_h)) {
+		fmt.eprintln("failed to init presentation")
+		return
+	}
+
+	game: cs2.Game
+	attached := false
+	game_pid: u32 = 0
+
+	defer renderer.window_destroy(hwnd, cfg.WINDOW_CLASS)
+	defer renderer.renderer_destroy(&renderer.ctx)
+	defer cs2.game_destroy(&game)
+
+	if !renderer.renderer_init(&renderer.ctx, int(monitor_w), int(monitor_h)) {
+		fmt.eprintln("failed to initialize renderer")
+		return
+	}
+
+	if !renderer.font_init(&renderer.font,
+		&renderer.ctx, cfg.font_path(), renderer.PIXEL_HEIGHT) {
+		fmt.eprintln("no usable font found; text disabled")
+	}
+
+	fmt.println("renderer initialized, entering loop")
+
+	screen := [2]f32 {f32(monitor_w), f32(monitor_h)}
+	world: cs2.World
+	tick_timer := time.now()
+	last_liveness := time.now()
+	last_attach := time.now()
+	menu: ui.Menu
+
+	for !attached {
+		if !renderer.window_pump_messages() {
+			fmt.println("exiting: WM_QUIT")
+			return
+		}
+
+		if time.since(last_attach) >= ATTACH_RETRY_INTERVAL {
+			last_attach = time.now()
+			if err := cs2.game_init(&game); err == remote.Error.None {
+				attached = true
+				game_pid = game.process.pid
+				fmt.printf("attached to %s\n", cs2.PROCESS_NAME)
+				break
+			}
+		}
+
+		if ui.menu_toggle(&menu) {
+			cfg.save()
+		}
+
+		draw_frame(hwnd, &menu, screen, game_pid, &world)
+	}
+
+	for {
+		if !renderer.window_pump_messages() {
+			fmt.println("exiting: WM_QUIT")
+			break
+		}
+
+		if time.since(last_liveness) >= LIVENESS_POLL_INTERVAL {
+			last_liveness = time.now()
+			if !remote.process_exists(game_pid) {
+				fmt.printf("%s closed, exiting\n", cs2.PROCESS_NAME)
+				break
+			}
+		}
+
+		if ui.menu_toggle(&menu) {
+			cfg.save()
+		}
+
+		if time.since(tick_timer) >=
+			time.Duration(cfg.settings.engine.tick_ms) * time.Millisecond {
+			cs2.game_tick(&game, &world)
+			tick_timer = time.now()
+		}
+
+		draw_frame(hwnd, &menu, screen, game_pid, &world)
+	}
 }
 
-test_span :: proc() {
-    fmt.println("span test")
-    fmt.println("=========")
+draw_frame :: proc (
+	hwnd:       windows.HWND,
+	menu:       ^ui.Menu,
+	screen:     [2]f32,
+	game_pid:   u32,
+	world:      ^cs2.World,
+) {
+	renderer.input_poll(hwnd)
 
-    plan := m.build_copy_plan(cs2.Counter_Strike_Player_Pawn)
-    fmt.printf("%#v\n\n", plan)
+	renderer.renderer_set_text_outline(
+		cfg.settings.colors.text_outline.r,
+		cfg.settings.colors.text_outline.g,
+		cfg.settings.colors.text_outline.b,
+		cfg.settings.colors.text_outline.a,
+	)
 
-    buffer := make([]u8, plan.span.total_bytes)
-    defer delete(buffer)
+	frame_start := time.now()
+	if !renderer.renderer_begin_frame(&renderer.ctx) {
+		return
+	}
 
-    write_field(buffer, plan.span.base_offset, 0x0330, uintptr(0xDEAD_BEEF))
-    write_field(buffer, plan.span.base_offset, 0x034c, i32(100))
-    write_field(buffer, plan.span.base_offset, 0x03e7, u8(2))
-    write_field(buffer, plan.span.base_offset, 0x03f8, [3]f32{1, 2, 3})
-    write_field(buffer, plan.span.base_offset, 0x1208, uintptr(0xCAFE_BABE))
-    write_field(buffer, plan.span.base_offset, 0x1220, uintptr(0xFEED_FACE))
-    write_field(buffer, plan.span.base_offset, 0x13b8, [3]f32{4, 5, 6})
-    write_field(buffer, plan.span.base_offset, 0x141c, f32(0.75))
-    write_field(buffer, plan.span.base_offset, 0x1c64, [2]u32{0xAAAA, 0xBBBB})
-    write_field(buffer, plan.span.base_offset, 0x1c70, true)
-    write_field(buffer, plan.span.base_offset, 0x1c72, false)
+	if world.valid && should_draw(game_pid, hwnd, menu.visible) {
+		ui.draw_esp(world, screen)
+	}
+	if menu.visible {
+		ui.draw_menu(menu, screen)
+	}
 
-    result := m.apply_copy_plan(buffer, plan, cs2.Counter_Strike_Player_Pawn)
-
-    fmt.printf("%#v\n", result)
-
-    assert(result.game_scene_node_ptr == uintptr(0xDEAD_BEEF))
-    assert(result.health == 100)
-    assert(result.team_num == u8(2))
-    assert(result.velocity == [3]f32{1, 2, 3})
-    assert(result.weapon_services_ptr == uintptr(0xCAFE_BABE))
-    assert(result.observer_services_ptr == uintptr(0xFEED_FACE))
-    assert(result.old_origin == [3]f32{4, 5, 6})
-    assert(result.flash_alpha == f32(0.75))
-    assert(result.spotted_mask == [2]u32{0xAAAA, 0xBBBB})
-    assert(result.is_scoping == true)
-    assert(result.is_defusing == false)
-
-    fmt.println("\nall assertions passed")
+	if !renderer.draw_flush(&renderer.ctx) {
+		return
+	}
+	renderer.renderer_present(&renderer.ctx, hwnd)
+	if cfg.settings.engine.fps_limit > 0 {
+		target := time.Second / time.Duration(cfg.settings.engine.fps_limit)
+		if elapsed := time.since(frame_start); elapsed < target {
+			time.sleep(target - elapsed)
+		}
+	}
 }
 
-test_read :: proc() {
-    fmt.println("memory read test")
-    fmt.println("================")
-
-    pid, err := m.find_process_id("notepad.exe")
-    if err != m.Memowy_Error.None {
-        fmt.printf("find_process_id failed: %v\n", err)
-        return
-    }
-
-    module, err1 := m.find_module(pid, "ntdll.dll")
-    if err1 != m.Memowy_Error.None {
-        fmt.printf("find_module failed: %v\n", err1)
-        return
-    }
-
-    process, err2 := m.open_process(pid)
-    if err2 != m.Memowy_Error.None {
-        fmt.printf("open_process failed: %v\n", err2)
-        return
-    }
-    defer m.close_process(process)
-
-    dos_header: [64]u8
-    err3 := m.read(process, module.base, &dos_header)
-    if err3 != m.Memowy_Error.None {
-        fmt.printf("read failed: %v\n", err3)
-        return
-    }
-
-    fmt.printf("notepad.exe pid: %v\n", pid)
-    fmt.printf("ntdll base: 0x%x\n", module.base)
-    fmt.printf("wildcard as (u16, char): (%v, %c)\n\n", m.SIGNATURE_WILDCARD, m.SIGNATURE_WILDCARD)
-
-    fmt.println("read 64 bytes")
-    fmt.printf("first two: %c\n\n", dos_header[0:2])
-
-    signatures := []struct {
-        name: string,
-        sig: []u16,
-    }{
-        {
-            "MZ",
-            {'M','Z'},
-        },
-        {
-            "M?",
-            {'M',m.SIGNATURE_WILDCARD},
-        },
-        {
-            "This program",
-            {'T','h','i','s',' ','p','r','o','g','r','a','m'},
-        },
-        {
-            "This??rogram",
-            {'T','h','i','s',m.SIGNATURE_WILDCARD,m.SIGNATURE_WILDCARD,'r','o','g','r','a','m'},
-        },
-    }
-
-    for s in signatures {
-        fmt.printf("finding %v\n", s.name)
-
-        addr, err := m.find_signature_in_module(process, module, s.sig)
-        if err != m.Memowy_Error.None {
-            fmt.printf("find_signature_in_module failed: %v\n", err)
-            return
-        }
-
-        fmt.printf("%c found at: 0x%x\n\n", s.sig, addr)
-    }
-}
-
-main :: proc() {
-    test_read()
-    fmt.println()
-    test_span()
+should_draw :: proc (game_pid: u32, hwnd: windows.HWND, menu_visible: bool) -> bool {
+	if menu_visible {
+		return true
+	}
+	foreground := windows.GetForegroundWindow()
+	if foreground == hwnd {
+		return true
+	}
+	return renderer.window_foreground_pid() == game_pid
 }

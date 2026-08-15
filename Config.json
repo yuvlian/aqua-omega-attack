@@ -1,0 +1,67 @@
+{
+	"esp": {
+		"enabled": true,
+		"name": true,
+		"box": false,
+		"skeleton": true,
+		"health_bar": true,
+		"health_point": false,
+		"weapon": true,
+		"ammo": true,
+		"c4": true,
+		"spectators": true,
+		"spectators_x": 156.00000000,
+		"spectators_y": 492.00000000,
+		"reloading": true,
+		"scoping": true,
+		"defusing": true,
+		"flashed": true
+	},
+	"display": {
+		"name_max": 10,
+		"font_size": 1.00000000,
+		"esp_font_size": 1.29999995
+	},
+	"engine": {
+		"tick_ms": 18,
+		"fps_limit": 128
+	},
+	"colors": {
+		"box": {
+			"r": 255,
+			"g": 0,
+			"b": 0,
+			"a": 255
+		},
+		"skeleton": {
+			"r": 4,
+			"g": 250,
+			"b": 255,
+			"a": 100
+		},
+		"text": {
+			"r": 255,
+			"g": 255,
+			"b": 255,
+			"a": 255
+		},
+		"text_outline": {
+			"r": 0,
+			"g": 0,
+			"b": 0,
+			"a": 255
+		},
+		"health": {
+			"r": 0,
+			"g": 255,
+			"b": 0,
+			"a": 100
+		},
+		"c4": {
+			"r": 255,
+			"g": 140,
+			"b": 0,
+			"a": 255
+		}
+	}
+}

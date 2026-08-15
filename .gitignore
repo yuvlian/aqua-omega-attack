@@ -1,0 +1,7 @@
+refs/
+*.exe
+*.dll
+*.obj
+*.pdb
+*.py
+tracker.odin
