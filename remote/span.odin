@@ -1,5 +1,6 @@
 package remote
 
+import "core:mem"
 import "core:reflect"
 import "core:slice"
 import "core:strconv"
@@ -16,8 +17,13 @@ Copy_Op :: struct {
 }
 
 Layout_Plan :: struct {
-	span: Memory_Span,
-	ops:  []Copy_Op,
+	span:      Memory_Span,
+	ops:       []Copy_Op,
+	allocator: mem.Allocator,
+}
+
+plan_destroy :: proc (plan: Layout_Plan) {
+	delete(plan.ops, plan.allocator)
 }
 
 Field_Loc :: struct {
@@ -111,8 +117,7 @@ build_copy_plan :: proc ($T: typeid) -> Layout_Plan {
 		lowest = 0
 	}
 
-	// do NOT free this!!
-	ops := make([dynamic]Copy_Op, len(locs), context.allocator)
+	ops := make([dynamic]Copy_Op, len(locs))
 	for l, i in locs {
 		ops[i] = Copy_Op {
 			src_offset = l.remote_offset - lowest,
@@ -126,7 +131,8 @@ build_copy_plan :: proc ($T: typeid) -> Layout_Plan {
 			base_offset = lowest,
 			total_bytes = highest - lowest,
 		},
-		ops = ops[:],
+		ops       = ops[:],
+		allocator = ops.allocator,
 	}
 }
 

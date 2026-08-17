@@ -45,8 +45,8 @@ Config :: struct {
 		esp_font_size: f32,
 	},
 	engine: struct {
-		tick_ms:   u64,
-		fps_limit: u64,
+		tick_ms:   i64,
+		fps_limit: i64,
 	},
 	colors: struct {
 		box:          Color,

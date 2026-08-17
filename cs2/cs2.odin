@@ -70,6 +70,13 @@ game_init :: proc (game: ^Game) -> remote.Error {
 
 game_destroy :: proc (game: ^Game) {
 	remote.close_process(game.process.handle)
+	remote.plan_destroy(game.plans.pawn)
+	remote.plan_destroy(game.plans.controller)
+	remote.plan_destroy(game.plans.weapon)
+	remote.plan_destroy(game.plans.scene_node)
+	remote.plan_destroy(game.plans.planted_c4)
+	remote.plan_destroy(game.plans.observer_services)
+	remote.plan_destroy(game.plans.weapon_services)
 }
 
 read_span :: proc (

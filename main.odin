@@ -1,7 +1,6 @@
 package main
 
 import "core:fmt"
-import "core:mem"
 import "core:sys/windows"
 import "core:time"
 import "./cfg"
@@ -16,30 +15,6 @@ ATTACH_RETRY_INTERVAL  :: 2 * time.Second
 LIVENESS_POLL_INTERVAL :: 500 * time.Millisecond
 
 main :: proc () {
-	// using `when` instead of `if` causes main.odin(4:8) Error: 'mem' declared but not used
-	// this is from https://gist.githubusercontent.com/karl-zylinski/4ccf438337123e7c8994df3b03604e33/raw/dfc02cd68fce72c35b17977c294aa02d1cf48f05/tracking_alloc_example.odin
-	if ODIN_DEBUG {
-		track: mem.Tracking_Allocator
-		mem.tracking_allocator_init(&track, context.allocator)
-		context.allocator = mem.tracking_allocator(&track)
-
-		defer {
-			if len(track.allocation_map) > 0 {
-				fmt.eprintf("=== %v allocations not freed: ===\n", len(track.allocation_map))
-				for _, entry in track.allocation_map {
-					fmt.eprintf("- %v bytes @ %v\n", entry.size, entry.location)
-				}
-			}
-			if len(track.bad_free_array) > 0 {
-				fmt.eprintf("=== %v incorrect frees: ===\n", len(track.bad_free_array))
-				for entry in track.bad_free_array {
-					fmt.eprintf("- %p @ %v\n", entry.memory, entry.location)
-				}
-			}
-			mem.tracking_allocator_destroy(&track)
-		}
-	}
-
 	cfg.load()
 
 	monitor_w := windows.GetSystemMetrics(windows.SM_CXSCREEN)
