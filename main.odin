@@ -27,6 +27,8 @@ main :: proc () {
 		fmt.eprintln("failed to create overlay window")
 		return
 	}
+
+	renderer.window_set_clickthrough(true)
 	if !renderer.present_init(int(monitor_w), int(monitor_h)) {
 		fmt.eprintln("failed to init presentation")
 		return
