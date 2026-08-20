@@ -42,6 +42,11 @@ present_bits:    rawptr
 present_w:       int
 present_h:       int
 
+win_left: windows.LONG
+win_top:  windows.LONG
+win_w:    windows.LONG
+win_h:    windows.LONG
+
 window_proc :: proc "system" (
 	hwnd: windows.HWND,
 	msg: windows.UINT,
@@ -70,11 +75,17 @@ window_proc :: proc "system" (
 	}
 }
 
-window_create :: proc (
-	title, class: cstring16,
-	width, height: int,
-) -> (windows.HWND, bool) {
+window_create :: proc (title, class: cstring16) -> (windows.HWND, bool) {
 	hinstance := cast(windows.HINSTANCE) windows.GetModuleHandleA(nil)
+
+	// exclude taskbar
+	work: windows.RECT
+	windows.SystemParametersInfoW(windows.SPI_GETWORKAREA, 0, &work, 0)
+
+	win_left = work.left
+	win_top = work.top
+	win_w = work.right - work.left
+	win_h = work.bottom - work.top
 
 	wc: windows.WNDCLASSEXW
 	wc.cbSize = cast(windows.UINT) size_of(windows.WNDCLASSEXW)
@@ -94,9 +105,10 @@ window_create :: proc (
 		class,
 		title,
 		windows.WS_POPUP,
-		0, 0, cast(windows.INT) width, cast(windows.INT) height,
+		work.left, work.top, win_w, win_h,
 		nil, nil, hinstance, nil,
 	)
+
 	if hwnd == nil {
 		return nil, false
 	}
@@ -142,10 +154,15 @@ present_frame :: proc (hwnd: windows.HWND, pixels: rawptr) {
 	mem.copy(present_bits, pixels, present_w*present_h*4)
 
 	size := windows.SIZE {
-		cx = cast(windows.LONG) present_w,
-		cy = cast(windows.LONG) present_h,
+		cx = win_w,
+		cy = win_h,
 	}
-	pt_src := windows.POINT {x = 0, y = 0}
+
+	pt_src := windows.POINT {
+		x = win_left,
+		y = win_top,
+	}
+
 	blend := windows.BLENDFUNCTION {
 		BlendOp             = windows.AC_SRC_OVER,
 		BlendFlags          = 0,

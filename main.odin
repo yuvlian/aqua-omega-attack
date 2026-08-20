@@ -20,8 +20,7 @@ main :: proc () {
 	monitor_w := windows.GetSystemMetrics(windows.SM_CXSCREEN)
 	monitor_h := windows.GetSystemMetrics(windows.SM_CYSCREEN)
 
-	hwnd, ok := renderer.window_create(cfg.WINDOW_TITLE,
-		cfg.WINDOW_CLASS, int(monitor_w), int(monitor_h))
+	hwnd, ok := renderer.window_create(cfg.WINDOW_TITLE, cfg.WINDOW_CLASS)
 
 	if !ok {
 		fmt.eprintln("failed to create overlay window")
