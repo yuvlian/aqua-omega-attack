@@ -30,7 +30,12 @@ a basic read-only counter-strike 2 external ESP with a handle hijacker made with
 - **tick (ms)**: how often game memory read
 - **fps limit**: esp render fps limit
 
-you can drag menu by holding the title. ur settings will save to file when u close the menu
+## misc
+
+- to open menu, press insert.
+- you can drag menu by holding the title.
+- ur settings will save to file when u close the menu.
+- this doesn't work with faceit.
 
 ## building
 
