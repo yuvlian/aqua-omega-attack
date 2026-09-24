@@ -67,7 +67,7 @@ Planted_C4 :: struct #packed {
 	game_scene_node_ptr: uintptr `0x0330`,
 
 	// m_nBombSite
-	bomb_site: i32 `0x11A4`,
+	bomb_site: i32 `0x128c`,
 }
 
 // C_CSPlayerPawn {client}
@@ -85,22 +85,22 @@ Counter_Strike_Player_Pawn :: struct #packed {
 	velocity: [3]f32 `0x03f8`,
 
 	// m_pWeaponServices
-	weapon_services_ptr: uintptr `0x1208`,
+	weapon_services_ptr: uintptr `0x12f0`,
 
 	// m_pObserverServices
-	observer_services_ptr: uintptr `0x1220`,
+	observer_services_ptr: uintptr `0x1308`,
 
 	// m_vOldOrigin
-	old_origin: [3]f32 `0x13b8`,
+	old_origin: [3]f32 `0x14a4`,
 
 	// m_flFlashOverlayAlpha
-	flash_alpha: f32 `0x141c`,
+	flash_alpha: f32 `0x1504`,
 
 	// m_bIsScoped
-	is_scoping: bool `0x1c78`,
+	is_scoping: bool `0x1ea0`,
 
 	// m_bIsDefusing
-	is_defusing: bool `0x1c7a`,
+	is_defusing: bool `0x1ea2`,
 }
 
 // CBasePlayerController {client}
@@ -109,40 +109,40 @@ Base_Player_Controller :: struct #packed {
 	pawn_handle: u32 `0x06bc`,
 
 	// m_iszPlayerName
-	player_name: [128]u8 `0x06f4`,
+	player_name: [128]u8 `0x06fc`,
 
 	// m_SteamID
-	steam_id: u64 `0x0780`,
+	steam_id: u64 `0x0788`,
 
 	// m_bIsLocalPlayerController
-	is_local_player: bool `0x0788`,
+	is_local_player: bool `0x0790`,
 }
 
 // C_BasePlayerWeapon {client}
 // unused; fields merged into Weapon_State
 Base_Player_Weapon :: struct #packed {
 	// m_AttributeManager
-	attribute_manager: Attribute_Container `0x11a8`,
+	attribute_manager: Attribute_Container `0x1290`,
 
 	// m_iClip1
-	remaining_ammo: i32 `0x1700`,
+	remaining_ammo: i32 `0x1928`,
 }
 
 // C_CSWeaponBase {client}
 // unused; fields merged into Weapon_State
 Counter_Strike_Weapon_Base :: struct #packed {
 	// m_bInReload
-	is_reloading: bool `0x1814`,
+	is_reloading: bool `0x1a3c`,
 }
 
 // Base_Player_Weapon + Counter_Strike_Weapon_Base
 Weapon_State :: struct #packed {
 	// m_AttributeManager
-	attribute_manager: Attribute_Container `0x11a8`,
+	attribute_manager: Attribute_Container `0x1290`,
 
 	// m_iClip1
-	remaining_ammo: i32 `0x1700`,
+	remaining_ammo: i32 `0x1928`,
 
 	// m_bInReload
-	is_reloading: bool `0x1814`,
+	is_reloading: bool `0x1a3c`,
 }

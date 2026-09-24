@@ -83,7 +83,7 @@ read_span :: proc (
 	game: ^Game,
 	base: uintptr,
 	plan: remote.Layout_Plan,
-	out: ^$T,
+	out:  ^$T,
 ) -> bool {
 	err := remote.read(
 		game.process.handle,
@@ -109,21 +109,21 @@ read_span :: proc (
 }
 
 resolve_entity :: proc (
-	game: ^Game,
+	game:       ^Game,
 	list_heads: [ENTITY_LIST_HEAD_COUNT]u64,
-	handle: uintptr,
+	handle:     uintptr,
 ) -> (uintptr, bool) {
 	index := (handle & ENTITY_HANDLE_MASK) >> ENTITY_HANDLE_INDEX_SHIFT
 	if index >= ENTITY_LIST_HEAD_COUNT || list_heads[index] == 0 {
 		return 0, false
 	}
 
+	addr := uintptr(list_heads[index]) +
+		ENTITY_ENTRY_STRIDE * (handle & ENTITY_HANDLE_INDEX_MASK)
 	ptr: uintptr
 	err := remote.read(
 		game.process.handle,
-		uintptr(
-			list_heads[index]) + ENTITY_ENTRY_STRIDE * (handle & ENTITY_HANDLE_INDEX_MASK
-		),
+		addr,
 		&ptr,
 	)
 	if err != remote.Error.None || ptr == 0 {
@@ -143,7 +143,7 @@ read_view_matrix :: proc (game: ^Game, world: ^World) -> bool {
 }
 
 read_list_heads :: proc (
-	game: ^Game,
+	game:            ^Game,
 	entity_list_ptr: uintptr,
 ) -> ([ENTITY_LIST_HEAD_COUNT]u64, bool) {
 	heads: [ENTITY_LIST_HEAD_COUNT]u64
@@ -183,8 +183,8 @@ read_max_clients :: proc (game: ^Game) -> int {
 }
 
 read_controllers :: proc (
-	game: ^Game,
-	list_heads: [ENTITY_LIST_HEAD_COUNT]u64,
+	game:        ^Game,
+	list_heads:  [ENTITY_LIST_HEAD_COUNT]u64,
 	max_clients: int,
 ) -> ([MAX_CLIENTS]uintptr, bool) {
 	controllers: [MAX_CLIENTS]uintptr
@@ -238,10 +238,10 @@ read_bones :: proc (game: ^Game, scene_node_ptr: uintptr, player: ^Player) {
 }
 
 read_weapon :: proc (
-	game: ^Game,
-	list_heads: [ENTITY_LIST_HEAD_COUNT]u64,
+	game:                ^Game,
+	list_heads:          [ENTITY_LIST_HEAD_COUNT]u64,
 	weapon_services_ptr: uintptr,
-	player: ^Player,
+	player:              ^Player,
 ) {
 	services: Player_Weapon_Services
 	if !read_span(game, weapon_services_ptr, game.plans.weapon_services, &services) {
@@ -271,10 +271,10 @@ read_weapon :: proc (
 }
 
 read_controller :: proc (
-	game: ^Game,
-	list_heads: [ENTITY_LIST_HEAD_COUNT]u64,
+	game:           ^Game,
+	list_heads:     [ENTITY_LIST_HEAD_COUNT]u64,
 	controller_ptr: uintptr,
-	player: ^Player,
+	player:         ^Player,
 ) -> bool {
 	player^ = {}
 

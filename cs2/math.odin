@@ -5,8 +5,8 @@ Vec3 :: struct { x, y, z: f32 }
 Mat4 :: struct { m: [4][4]f32 }
 
 world_to_screen :: proc (
-	m: Mat4,
-	pos: Vec3,
+	m:      Mat4,
+	pos:    Vec3,
 	screen: Vec2,
 ) -> (Vec2, bool) {
 	view := m.m[3][0] * pos.x + m.m[3][1] * pos.y + m.m[3][2] * pos.z + m.m[3][3]

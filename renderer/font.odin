@@ -11,43 +11,43 @@ PIXEL_HEIGHT :: 16
 GLYPH_PAD    :: 2
 
 Glyph :: struct {
-	u0, v0, u1, v1:          f32,
-	width, height:           f32,
-	x_offset, y_offset:      f32,
-	advance:                 f32,
+	u0, v0, u1, v1:     f32,
+	width, height:      f32,
+	x_offset, y_offset: f32,
+	advance:            f32,
 }
 
 Font :: struct {
-	atlas_image:   vk.Image,
-	atlas_memory:  vk.DeviceMemory,
-	atlas_view:    vk.ImageView,
-	sampler:       vk.Sampler,
-	glyphs:        map[rune]Glyph,
-	info:          stbtt.fontinfo,
-	font_data:     []byte,
-	scale:         f32,
-	size:          f32,
-	ascent:        f32,
-	descent:       f32,
-	pixel_height:  f32,
-	atlas_w:       int,
-	atlas_h:       int,
-	cursor_x:      int,
-	cursor_y:      int,
-	row_height:    int,
-	row_pitch:     int,
-	mapped:        rawptr,
-	white_uv:      [2]f32,
-	fallback:      Glyph,
-	valid:         bool,
+	atlas_image:  vk.Image,
+	atlas_memory: vk.DeviceMemory,
+	atlas_view:   vk.ImageView,
+	sampler:      vk.Sampler,
+	glyphs:       map[rune]Glyph,
+	info:         stbtt.fontinfo,
+	font_data:    []byte,
+	scale:        f32,
+	size:         f32,
+	ascent:       f32,
+	descent:      f32,
+	pixel_height: f32,
+	atlas_w:      int,
+	atlas_h:      int,
+	cursor_x:     int,
+	cursor_y:     int,
+	row_height:   int,
+	row_pitch:    int,
+	mapped:       rawptr,
+	white_uv:     [2]f32,
+	fallback:     Glyph,
+	valid:        bool,
 }
 
 font: Font
 
 transition_image_layout :: proc (
-	r: ^Context,
-	image: vk.Image,
-	old_layout,
+	r:          ^Context,
+	image:      vk.Image,
+	old_layout: vk.ImageLayout,
 	new_layout: vk.ImageLayout,
 ) {
 	alloc_info := vk.CommandBufferAllocateInfo {

@@ -138,13 +138,13 @@ save :: proc () {
 }
 
 font_path :: proc () -> string {
-	candidates := []string {
-		"C:\\Windows\\Fonts\\msyh.ttc",
-		"C:\\Windows\\Fonts\\msyh.ttf",
-		"C:\\Windows\\Fonts\\msyhl.ttc",
-		"C:\\Windows\\Fonts\\simhei.ttf",
-		"C:\\Windows\\Fonts\\simsun.ttc",
-		"C:\\Windows\\Fonts\\segoeui.ttf",
+	candidates := []string{
+		`C:\Windows\Fonts\msyh.ttc`,
+		`C:\Windows\Fonts\msyh.ttf`,
+		`C:\Windows\Fonts\msyhl.ttc`,
+		`C:\Windows\Fonts\simhei.ttf`,
+		`C:\Windows\Fonts\simsun.ttc`,
+		`C:\Windows\Fonts\segoeui.ttf`,
 	}
 	for candidate in candidates {
 		if os.exists(candidate) {

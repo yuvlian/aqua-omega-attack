@@ -115,10 +115,10 @@ read_typed :: proc (handle: windows.HANDLE, address: uintptr, out: ^$T) -> Error
 }
 
 read_raw :: proc (
-	handle: windows.HANDLE,
+	handle:  windows.HANDLE,
 	address: uintptr,
-	buffer: rawptr,
-	size: uint,
+	buffer:  rawptr,
+	size:    uint,
 ) -> Error {
 	bytes_read: uint
 
@@ -142,10 +142,10 @@ write_typed :: proc (handle: windows.HANDLE, address: uintptr, value: ^$T) -> Er
 }
 
 write_raw :: proc (
-	handle: windows.HANDLE,
+	handle:  windows.HANDLE,
 	address: uintptr,
-	buffer: rawptr,
-	size: uint,
+	buffer:  rawptr,
+	size:    uint,
 ) -> Error {
 	bytes_written: uint
 

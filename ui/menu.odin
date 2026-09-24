@@ -130,9 +130,9 @@ fps_row :: proc (ctx: ^Widget_Ctx, y: f32, menu: ^Menu) -> f32 {
 checkbox :: proc (
 	label: string,
 	value: ^bool,
-	ctx: ^Widget_Ctx,
-	y: f32,
-	menu: ^Menu,
+	ctx:   ^Widget_Ctx,
+	y:     f32,
+	menu:  ^Menu,
 ) -> f32 {
 	if !ctx.measure {
 		row := [4]f32 {menu.panel_x, y, PANEL_W, ROW_H}
@@ -162,12 +162,12 @@ checkbox :: proc (
 }
 
 slider :: proc (
-	label: string,
-	value: ^f32,
+	label:    string,
+	value:    ^f32,
 	min, max: f32,
-	ctx: ^Widget_Ctx,
-	y: f32,
-	menu: ^Menu,
+	ctx:      ^Widget_Ctx,
+	y:        f32,
+	menu:     ^Menu,
 ) -> f32 {
 	if !ctx.measure {
 		s := font_scale()
@@ -219,12 +219,12 @@ slider :: proc (
 }
 
 color_row :: proc (
-	name: string,
+	name:  string,
 	color: cfg.Color,
 	field: Color_Field,
-	ctx: ^Widget_Ctx,
-	y: f32,
-	menu: ^Menu,
+	ctx:   ^Widget_Ctx,
+	y:     f32,
+	menu:  ^Menu,
 ) -> f32 {
 	if !ctx.measure {
 		row := [4]f32 {menu.panel_x, y, PANEL_W, ROW_H}
@@ -260,9 +260,9 @@ number_box_float :: proc (
 	label: string,
 	value: ^f32,
 	field: Edit_Field,
-	ctx: ^Widget_Ctx,
-	y: f32,
-	menu: ^Menu,
+	ctx:   ^Widget_Ctx,
+	y:     f32,
+	menu:  ^Menu,
 ) -> f32 {
 	if !ctx.measure {
 		box := [4]f32 {menu.panel_x + PANEL_W - 8 - 56, y + ROW_H / 2 - 8, 56, 16}
@@ -334,9 +334,9 @@ number_box_int :: proc (
 	label: string,
 	value: ^$T,
 	field: Edit_Field,
-	ctx: ^Widget_Ctx,
-	y: f32,
-	menu: ^Menu,
+	ctx:   ^Widget_Ctx,
+	y:     f32,
+	menu:  ^Menu,
 ) -> f32 {
 	if !ctx.measure {
 		box := [4]f32 {menu.panel_x + PANEL_W - 8 - 56, y + ROW_H / 2 - 8, 56, 16}

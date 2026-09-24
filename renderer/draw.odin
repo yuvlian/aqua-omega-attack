@@ -58,9 +58,10 @@ push_triangle :: proc (a, b, c: u32) {
 }
 
 push_quad :: proc (
-	p0, p1, p2, p3, uv0, uv1, uv2, uv3: [2]f32,
-	color: Color,
-	shape: [2]f32 = {0, 0},
+	p0, p1, p2, p3:     [2]f32,
+	uv0, uv1, uv2, uv3: [2]f32,
+	color:              Color,
+	shape:              [2]f32 = {0, 0},
 ) {
 	base := draw_state.vertex_count
 	push_vertex(p0, uv0, color, shape)
@@ -245,9 +246,9 @@ draw_flush :: proc (r: ^Context) -> bool {
 }
 
 find_memory_type :: proc (
-	props: vk.PhysicalDeviceMemoryProperties,
+	props:     vk.PhysicalDeviceMemoryProperties,
 	type_bits: u32,
-	required: vk.MemoryPropertyFlags,
+	required:  vk.MemoryPropertyFlags,
 ) -> u32 {
 	for i in 0 ..< int(props.memoryTypeCount) {
 		if (type_bits & (1 << uint(i))) == 0 {

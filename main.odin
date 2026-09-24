@@ -112,11 +112,11 @@ main :: proc () {
 }
 
 draw_frame :: proc (
-	hwnd:       windows.HWND,
-	menu:       ^ui.Menu,
-	screen:     [2]f32,
-	game_pid:   u32,
-	world:      ^cs2.World,
+	hwnd:     windows.HWND,
+	menu:     ^ui.Menu,
+	screen:   [2]f32,
+	game_pid: u32,
+	world:    ^cs2.World,
 ) {
 	renderer.input_poll(hwnd)
 

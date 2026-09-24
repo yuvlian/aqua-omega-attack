@@ -8,14 +8,14 @@ foreign import user32 "system:User32.lib"
 @(default_calling_convention = "stdcall")
 foreign user32 {
 	UpdateLayeredWindow :: proc (
-		hWnd: windows.HWND,
-		hdcDst: windows.HDC,
-		pptDst: ^windows.POINT,
-		psize: ^windows.SIZE,
-		hdcSrc: windows.HDC,
-		pptSrc: ^windows.POINT,
-		crKey: windows.COLORREF,
-		pblend: ^windows.BLENDFUNCTION,
+		hWnd:    windows.HWND,
+		hdcDst:  windows.HDC,
+		pptDst:  ^windows.POINT,
+		psize:   ^windows.SIZE,
+		hdcSrc:  windows.HDC,
+		pptSrc:  ^windows.POINT,
+		crKey:   windows.COLORREF,
+		pblend:  ^windows.BLENDFUNCTION,
 		dwFlags: windows.DWORD,
 	) -> windows.BOOL ---
 }
@@ -48,8 +48,8 @@ win_w:    windows.LONG
 win_h:    windows.LONG
 
 window_proc :: proc "system" (
-	hwnd: windows.HWND,
-	msg: windows.UINT,
+	hwnd:   windows.HWND,
+	msg:    windows.UINT,
 	wparam: windows.WPARAM,
 	lparam: windows.LPARAM,
 ) -> windows.LRESULT {

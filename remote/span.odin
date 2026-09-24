@@ -1,5 +1,6 @@
 package remote
 
+import "core:fmt"
 import "core:mem"
 import "core:reflect"
 import "core:slice"
@@ -45,7 +46,7 @@ parse_field_tag :: proc (tag_str: string) -> (int, bool) {
 
 get_struct_info :: proc (
 	info: ^reflect.Type_Info,
-	ctx: string,
+	ctx:  string,
 ) -> reflect.Type_Info_Struct {
 	base_info := reflect.type_info_base(info)
 	struct_info, ok := base_info.variant.(reflect.Type_Info_Struct)
@@ -56,9 +57,9 @@ get_struct_info :: proc (
 }
 
 walk_fields :: proc (
-	info: ^reflect.Type_Info,
+	info:        ^reflect.Type_Info,
 	remote_base: int,
-	local_base: int,
+	local_base:  int,
 	out: ^[dynamic]Field_Loc,
 ) {
 	struct_info := get_struct_info(info, "walk_fields called on non-struct type")
@@ -77,7 +78,10 @@ walk_fields :: proc (
 		}
 
 		if field_offset < prev_offset {
-			panic("make sure struct field tags are ascending!")
+			panic(
+				fmt.tprintf(
+					"0x%x < 0x%x, make sure struct field tags are ascending!\n",
+					field_offset, prev_offset))
 		}
 		prev_offset = field_offset
 

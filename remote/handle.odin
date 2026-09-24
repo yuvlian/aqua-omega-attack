@@ -24,7 +24,7 @@ close_process :: proc (handle: windows.HANDLE) {
 }
 
 enumerate_handle_owners :: proc (
-	target_pid: u32,
+	target_pid:  u32,
 	allocator := context.allocator
 ) -> []Handle_Owner {
 	self_pid := windows.GetCurrentProcessId()
@@ -61,7 +61,7 @@ enumerate_handle_owners :: proc (
 		}
 
 		count := (^uint)(raw_data(buffer))^
-		entries := cast([^]System_Handle_Entry)raw_data(buffer[16:])
+		entries := cast([^]System_Handle_Entry) raw_data(buffer[16:])
 
 		process_type_index: u16 = 0
 		for i in 0 ..< int(count) {
